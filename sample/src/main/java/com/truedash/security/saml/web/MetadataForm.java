@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.security.saml.web;
+package com.truedash.security.saml.web;
 
 /**
  * Form able to store UI data related to metadata.
