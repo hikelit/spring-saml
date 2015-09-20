@@ -74,8 +74,7 @@
 	<!-- Handler deciding where to redirect user after failed login -->
 	<!-- TODO: implement org.springframework.security.web.authentication.AuthenticationFailureHandler 
 		for error handler -->
-	<bean id="failureRedirectHandler"
-		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+	<bean id="failureRedirectHandler" class="com.truedash.security.custom.LoginFailureHandler">
 		<property name="useForward" value="true" />
 		<property name="defaultFailureUrl" value="/error.jsp" />
 	</bean>
@@ -207,17 +206,12 @@
 					<constructor-arg> <value type="java.lang.String">http://idp.ssocircle.com/idp-meta.xml</value> 
 					</constructor-arg> <constructor-arg> <value type="int">50000</value> </constructor-arg> 
 					<property name="parserPool" ref="parserPool" /> </bean> -->
-				 <bean
+				<bean
 					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
-					<!-- <constructor-arg>
-						<bean
-							class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
-							<constructor-arg>
-								<value type="java.io.File">classpath:metadata/idp-meta.xml</value>
-							</constructor-arg>
-							<property name="parserPool" ref="parserPool" />
-						</bean>
-					</constructor-arg> -->
+					<!-- <constructor-arg> <bean class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider"> 
+						<constructor-arg> <value type="java.io.File">classpath:metadata/idp-meta.xml</value> 
+						</constructor-arg> <property name="parserPool" ref="parserPool" /> </bean> 
+						</constructor-arg> -->
 					<constructor-arg>
 						<bean
 							class="org.opensaml.saml2.metadata.provider.ResourceBackedMetadataProvider">
@@ -236,7 +230,7 @@
 						<bean
 							class="org.springframework.security.saml.metadata.ExtendedMetadata" />
 					</constructor-arg>
-				</bean> 
+				</bean>
 			</list>
 		</constructor-arg>
 	</bean>
