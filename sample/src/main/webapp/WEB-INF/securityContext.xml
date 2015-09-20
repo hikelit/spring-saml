@@ -27,8 +27,8 @@
 			access="IS_AUTHENTICATED_ANONYMOUSLY" />
 		<security:intercept-url pattern="/saml/web/**"
 			access="ROLE_ADMIN" />
-		<security:custom-filter before="FIRST"
-			ref="metadataGeneratorFilter" />
+		<!-- <security:custom-filter before="FIRST" ref="metadataGeneratorFilter" 
+			/> -->
 	</security:http>
 
 	<!-- Secured pages with SAML as entry point -->
@@ -36,8 +36,8 @@
 		use-expressions="false">
 		<security:intercept-url pattern="/**"
 			access="IS_AUTHENTICATED_FULLY" />
-		<security:custom-filter before="FIRST"
-			ref="metadataGeneratorFilter" />
+		<!-- <security:custom-filter before="FIRST" ref="metadataGeneratorFilter" 
+			/> -->
 		<security:custom-filter after="BASIC_AUTH_FILTER"
 			ref="samlFilter" />
 	</security:http>
@@ -72,6 +72,8 @@
 		<property name="defaultTargetUrl" value="/" /> </bean> -->
 
 	<!-- Handler deciding where to redirect user after failed login -->
+	<!-- TODO: implement org.springframework.security.web.authentication.AuthenticationFailureHandler 
+		for error handler -->
 	<bean id="failureRedirectHandler"
 		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
 		<property name="useForward" value="true" />
@@ -148,7 +150,6 @@
 			</bean>
 		</constructor-arg>
 	</bean>
-
 	<!-- The filter is waiting for connections on URL suffixed with filterSuffix 
 		and presents SP metadata there -->
 	<bean id="metadataDisplayFilter"
@@ -165,15 +166,77 @@
 		class="org.springframework.security.saml.metadata.CachingMetadataManager">
 		<constructor-arg>
 			<list>
-				<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
+				<bean
+					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
 					<constructor-arg>
-						<value type="java.lang.String">http://idp.ssocircle.com/idp-meta.xml</value>
+						<bean
+							class="org.opensaml.saml2.metadata.provider.ResourceBackedMetadataProvider">
+							<constructor-arg>
+								<bean class="java.util.Timer" />
+							</constructor-arg>
+							<constructor-arg>
+								<bean class="org.opensaml.util.resource.ClasspathResource">
+									<constructor-arg value="/metadata/spring_saml_metadata-heroku.xml" />
+								</bean>
+							</constructor-arg>
+							<property name="parserPool" ref="parserPool" />
+						</bean>
 					</constructor-arg>
 					<constructor-arg>
-						<value type="int">50000</value>
+						<bean
+							class="org.springframework.security.saml.metadata.ExtendedMetadata">
+							<property name="local" value="true" />
+							<property name="securityProfile" value="metaiop" />
+							<property name="sslSecurityProfile" value="pkix" />
+							<property name="sslHostnameVerification" value="default" />
+							<property name="signMetadata" value="false" />
+							<property name="signingKey" value="apollo" />
+							<property name="encryptionKey" value="apollo" />
+							<property name="requireArtifactResolveSigned" value="false" />
+							<property name="requireLogoutRequestSigned" value="false" />
+							<property name="requireLogoutResponseSigned" value="false" />
+							<property name="idpDiscoveryEnabled" value="true" />
+							<property name="idpDiscoveryURL"
+								value="http://obscure-tundra-7635.herokuapp.com:80/saml/discovery" />
+							<property name="idpDiscoveryResponseURL"
+								value="http://obscure-tundra-7635.herokuapp.com:80/saml/login?disco=true" />
+						</bean>
 					</constructor-arg>
-					<property name="parserPool" ref="parserPool" />
 				</bean>
+				<!-- <bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider"> 
+					<constructor-arg> <value type="java.lang.String">http://idp.ssocircle.com/idp-meta.xml</value> 
+					</constructor-arg> <constructor-arg> <value type="int">50000</value> </constructor-arg> 
+					<property name="parserPool" ref="parserPool" /> </bean> -->
+				 <bean
+					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+					<!-- <constructor-arg>
+						<bean
+							class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
+							<constructor-arg>
+								<value type="java.io.File">classpath:metadata/idp-meta.xml</value>
+							</constructor-arg>
+							<property name="parserPool" ref="parserPool" />
+						</bean>
+					</constructor-arg> -->
+					<constructor-arg>
+						<bean
+							class="org.opensaml.saml2.metadata.provider.ResourceBackedMetadataProvider">
+							<constructor-arg>
+								<bean class="java.util.Timer" />
+							</constructor-arg>
+							<constructor-arg>
+								<bean class="org.opensaml.util.resource.ClasspathResource">
+									<constructor-arg value="/metadata/idp-meta.xml" />
+								</bean>
+							</constructor-arg>
+							<property name="parserPool" ref="parserPool" />
+						</bean>
+					</constructor-arg>
+					<constructor-arg>
+						<bean
+							class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+					</constructor-arg>
+				</bean> 
 			</list>
 		</constructor-arg>
 	</bean>
