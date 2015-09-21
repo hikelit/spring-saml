@@ -57,7 +57,7 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
-			</plugin>
+			</plugin>			
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -163,6 +163,11 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>3.1.2.RELEASE</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>				
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>20140107</version>				
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

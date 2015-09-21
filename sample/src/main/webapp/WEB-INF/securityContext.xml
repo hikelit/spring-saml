@@ -25,6 +25,8 @@
 			login-page="/saml/web/metadata/login" default-target-url="/saml/web/metadata" />
 		<security:intercept-url pattern="/saml/web/metadata/login"
 			access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/saml/web/redirect/truedash"
+			access="IS_AUTHENTICATED_ANONYMOUSLY" />	
 		<security:intercept-url pattern="/saml/web/**"
 			access="ROLE_ADMIN" />
 		<security:custom-filter before="FIRST"
